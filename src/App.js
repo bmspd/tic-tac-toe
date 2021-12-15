@@ -1,9 +1,11 @@
 import './main.scss'
 import Board from "./Board";
+import ShadowedText from "./shadowedText";
+
 function App() {
   return (
     <div className='tic-tac-toe'>
-      <h1>TIC TAC TOE</h1>
+        <ShadowedText text="TIC TAC TOE" fontSize='40px'/>
         <Board />
     </div>
   );

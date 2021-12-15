@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Fine College';
+  src: local('Fine College'), url(./assets/fonts/FineCollege.ttf)
+}
+*{
+  font-family: "Fine College", serif;
+  color: #F8F272;
+}
 body {
   background-color: #1C3041;
   .tic-tac-toe{
@@ -6,6 +14,8 @@ body {
     justify-content: center;
     align-items: center;
     .game-board {
+      margin-bottom: 20px;
+      margin-top: 20px;
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       grid-template-rows: 1fr 1fr 1fr;
@@ -28,15 +38,53 @@ body {
   .history-part{
     cursor: pointer;
     margin-top: 20px;
-    width: 30px;
-    height: 30px;
-    background-color: white;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(252,247,248,0.9);
     display: flex;
     justify-content: center;
     align-items: center;
+    border-radius: 50%;
     p{
       font-size: 20px;
-      font-weight: 600;
+      color: black;
     }
+  }
+  .__restart {
+    display: flex;
+    gap: 20px;
+    h2{
+      cursor: pointer;
+    }
+  }
+  #resButton:hover {
+    color: #FFC914;
+  }
+  #noButton {
+    color:#BAD9B5;
+  }
+  #noButton:hover{
+      color: #45CB85;
+  }
+  #yesButton {
+    color:#B97375;
+  }
+  #yesButton:hover{
+    color: #E84855;
+  }
+
+}
+
+.__shadowedText{
+  position: relative;
+  .__text {
+  }
+  .__shadow{
+    opacity: 0.2;
+    z-index: -1;
+    width:100%;
+    position: absolute;
+    left:5px;
+    top:5px;
   }
 }

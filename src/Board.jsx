@@ -1,6 +1,7 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Field from "./Field";
 import HistoryPart from "./HistoryPart";
+import VanillaTilt from "vanilla-tilt";
 const startField = [
     ['.', '.', '.'],
     ['.', '.', '.'],
@@ -34,6 +35,8 @@ const Board = () => {
     const [gameStatus, setGameStatus] = useState(true);
     const [isRunningBack, setIsRunningBack] = useState(false)
     const [currentMove, setCurrentMove] = useState(-1)
+    const boardRef = useRef(null)
+    const [shouldRestart, setShouldRestart] = useState(false)
     const clickFieldHandler = (x,y) => () => {
         if (currentMove < history.length - 1) {
             setHistory(history.slice(0, currentMove+1))
@@ -58,13 +61,20 @@ const Board = () => {
         setGameStatus(isGameStillPlaying(field));
         setHistory([...history, field])
     }, [field])
-
+    useEffect(() => {
+        VanillaTilt.init(boardRef.current, {
+            scale: 1.2,
+            max: 0
+        })
+    }, [boardRef])
     return (
         <>
             <div style={{display:'flex'}}>
-            <h2>{gameStatus ? `PLAYER ${currentPlayer} TURN` : `PLAYER ${currentPlayer === 1 ? 2 : 1} WINS`}</h2>
+            <h2>{gameStatus ? `PLAYER ${currentPlayer} TURN` :
+                !field.some(row => row.includes('.')) ? 'DRAW, NO ONE WINS'
+                    :`PLAYER ${currentPlayer === 1 ? 2 : 1} WINS`}</h2>
             </div>
-        <div className="game-board">
+        <div ref={boardRef}className="game-board">
             <Field onClick={clickFieldHandler(0,0)} currentSign={field[0][0]}/>
             <Field onClick={clickFieldHandler(0,1)} currentSign={field[0][1]}/>
             <Field onClick={clickFieldHandler(0,2)} currentSign={field[0][2]}/>
@@ -75,7 +85,7 @@ const Board = () => {
             <Field onClick={clickFieldHandler(2,1)} currentSign={field[2][1]}/>
             <Field onClick={clickFieldHandler(2,2)} currentSign={field[2][2]}/>
         </div>
-            <h2 style={{color:'white', fontSize: '30px'}}>{history.length - 1}({currentMove})</h2>
+            <h2 style={{fontSize: '30px'}}>Turn {currentMove}</h2>
             <div style={{display:'flex', gap: '20px'}}>
                 {history.map((el, index) =>
                     <HistoryPart slicedHistory={history.slice(0,index+1)}
@@ -89,9 +99,21 @@ const Board = () => {
                 }
             </div>
 
-            <h3 style={{color:'white'}}>{gameStatus ? 'game is playing' : 'game is finished'}</h3>
+            <h3>{gameStatus ? 'game is playing' : 'game is finished'}</h3>
+            <div className='__restart'>
+                {shouldRestart ? <h2 style={{color:'#FFA737'}}>Are you sure?</h2>
+                    :<h2 id="resButton" onClick={() => setShouldRestart(true)}>Restart</h2>}
+                {shouldRestart && <h2 id="yesButton" onClick={()=> {
+                    setCurrentMove(0);
+                    setHistory([startField])
+                    setField(startField)
+                    setIsRunningBack(true)
+                    setShouldRestart(false)
+                }}>Yes!</h2>}
+                {shouldRestart && <h2 id="noButton" onClick={() => setShouldRestart(false)}>No</h2>}
+            </div>
         </>
     );
-};
+}
 
 export default Board;
