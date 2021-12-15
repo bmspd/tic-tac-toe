@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import circle from './assets/circle.png'
-import cross from './assets/cross.png'
 import Field from "./Field";
+import HistoryPart from "./HistoryPart";
 const startField = [
     ['.', '.', '.'],
     ['.', '.', '.'],
@@ -30,18 +29,36 @@ const isGameStillPlaying = (field) => {
 }
 const Board = () => {
     const [currentPlayer, setCurrentPlayer] = useState(1);
+    const [history, setHistory] = useState([]);
     const [field, setField] = useState(startField)
     const [gameStatus, setGameStatus] = useState(true);
+    const [isRunningBack, setIsRunningBack] = useState(false)
+    const [currentMove, setCurrentMove] = useState(-1)
     const clickFieldHandler = (x,y) => () => {
+        if (currentMove < history.length - 1) {
+            setHistory(history.slice(0, currentMove+1))
+            setCurrentPlayer(currentMove % 2 === 0 ? 1 : 2)
+        }
         if (field[x][y] !== '.' || !gameStatus) {
             return;
         }
-        let newField = field.slice(0);
+        let newField = field.map(row => row.slice(0));
         currentPlayer === 1 ? newField[x][y] = 'X' : newField[x][y] = 'O';
-        setField(newField)
-        setGameStatus(isGameStillPlaying(field));
         currentPlayer === 1? setCurrentPlayer(2) : setCurrentPlayer(1)
+        setField(newField)
     }
+    useEffect(() => {
+        if (isRunningBack) {
+            setIsRunningBack(!isRunningBack)
+            setCurrentPlayer(currentMove % 2 === 0 ? 1 : 2)
+            setGameStatus(isGameStillPlaying(field));
+            return;
+        }
+        setCurrentMove(currentMove+1);
+        setGameStatus(isGameStillPlaying(field));
+        setHistory([...history, field])
+    }, [field])
+
     return (
         <>
             <div style={{display:'flex'}}>
@@ -58,6 +75,20 @@ const Board = () => {
             <Field onClick={clickFieldHandler(2,1)} currentSign={field[2][1]}/>
             <Field onClick={clickFieldHandler(2,2)} currentSign={field[2][2]}/>
         </div>
+            <h2 style={{color:'white', fontSize: '30px'}}>{history.length - 1}({currentMove})</h2>
+            <div style={{display:'flex', gap: '20px'}}>
+                {history.map((el, index) =>
+                    <HistoryPart slicedHistory={history.slice(0,index+1)}
+                                 index={index}
+                                 setHistory={setHistory}
+                                 setField={setField}
+                                 setIsRunningBack={setIsRunningBack}
+                                 setCurrentMove={setCurrentMove}
+                                 key={`__history-part-${index}`}
+                    />)
+                }
+            </div>
+
             <h3 style={{color:'white'}}>{gameStatus ? 'game is playing' : 'game is finished'}</h3>
         </>
     );
